@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -532,6 +532,56 @@
   }
   .footer span { color: var(--amber); font-weight: 600; }
  
+  /* MCQ & TRUE/FALSE STYLES */
+  .comp-q-wrap { margin-bottom: 6px; }
+  .comp-q-header {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;
+  }
+  .mcq-options { display: flex; flex-direction: column; gap: 9px; margin-left: 40px; }
+  .mcq-opt {
+    display: flex; align-items: center; gap: 12px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 16px;
+    cursor: pointer;
+    background: var(--warm-white);
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+  .mcq-opt:hover { border-color: var(--amber); background: #FFFBEF; transform: translateX(3px); }
+  .mcq-letter {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--amber-light);
+    color: var(--ink);
+    font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mcq-text { flex: 1; line-height: 1.5; color: var(--ink-soft); }
+  .mcq-opt.mcq-correct { border-color: var(--forest); background: #F0FFF8; }
+  .mcq-opt.mcq-correct .mcq-letter { background: var(--forest); color: #fff; }
+  .mcq-opt.mcq-wrong { border-color: #C0392B; background: #FFF5F5; opacity: 0.7; }
+  .mcq-opt.mcq-wrong .mcq-letter { background: #C0392B; color: #fff; }
+ 
+  .tf-btn {
+    flex: 1; padding: 12px 20px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    background: var(--warm-white);
+    transition: all 0.2s;
+  }
+  .tf-btn:hover:not(:disabled) { border-color: var(--amber); background: #FFFBEF; transform: translateY(-2px); }
+  .tf-btn:disabled { cursor: not-allowed; }
+  .tf-btn.tf-correct { border-color: var(--forest); background: #F0FFF8; color: var(--forest); }
+  .tf-btn.tf-wrong { border-color: #C0392B; background: #FFF5F5; color: #C0392B; opacity: 0.7; }
+ 
+  .comp-feedback { margin-top: 10px; margin-left: 40px; min-height: 20px; }
+  .fb-ok { color: var(--forest); font-size: 13px; font-weight: 600; }
+  .fb-err { color: #C0392B; font-size: 13px; font-weight: 500; }
+ 
   /* CERTIFICATE MODAL */
   .cert-overlay {
     position: fixed; inset: 0;
@@ -867,11 +917,15 @@
 <!-- ======================== SECTION 4: COMPREHENSION QUESTIONS ======================== -->
 <div class="section" id="sec3">
   <div class="card">
-    <div class="card-title">💡 Answer the Questions</div>
-    <div class="card-sub">Write your answer in the box. Then click "Show Answer" to compare with the model answer.</div>
+    <div class="card-title">💡 Comprehension Check</div>
+    <div class="card-sub">Read each question carefully and choose the best answer. If you get one wrong, read the hint and try again! 🔄</div>
  
     <div id="comprehensionContainer"></div>
-    <button class="btn btn-primary" onclick="finishComprehension()" style="margin-top:16px;">I've Finished All Questions! 🎉</button>
+ 
+    <div style="margin-top:20px;background:linear-gradient(135deg,#FFF9ED,#FFF3DC);border:1.5px solid var(--amber);border-radius:12px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <span style="font-size:14px;font-weight:600;color:var(--ink);">Your score: <span id="compScore" style="color:var(--terracotta);font-family:'DM Serif Display',serif;font-size:20px;">0/10</span></span>
+      <span style="font-size:12px;color:var(--muted);">Questions auto-submit when you select an answer.</span>
+    </div>
     <div id="compFeedback" class="feedback"></div>
   </div>
 </div>
@@ -1063,16 +1117,43 @@ const glossary = {
 };
  
 const compQs = [
-  { q: "Why do many employers consider communication skills as important as technical skills?", a: "Because how you communicate affects your work and career. Companies need workers who can share ideas clearly, and without good communication, even the best technical skills can fail." },
-  { q: "According to the text, what percentage of employers think recent graduates lack professional communication skills?", a: "39% of employers think recent graduates lack professional communication skills. Also, 46% say many new hires struggle with professionalism in writing and speaking." },
-  { q: "What are some of the problems that can happen when communication fails in the workplace?", a: "Employees can misunderstand instructions, causing delays and errors. Clients may lose trust if emails are unprofessional, and these problems cost companies time and money." },
-  { q: "What are the key elements of professional written communication in the workplace?", a: "A clear subject line, a professional greeting, short and easy-to-read paragraphs, a polite closing, good spelling/grammar/punctuation, and always proofreading before sending." },
-  { q: "What skills are important for effective spoken communication in the workplace?", a: "Good presentation skills, speaking clearly and confidently, answering questions well, knowing when to speak and listen in meetings, and adjusting your tone for different people." },
-  { q: "How can active listening help improve communication and relationships in the workplace?", a: "Active listening helps you understand others better. By paying attention, asking questions, and repeating key points, you avoid misunderstandings and build stronger working relationships." },
-  { q: "What are some common communication issues that employers have with recent graduates?", a: "Unprofessional emails, weak interpersonal skills, fear of public speaking, using informal language or emojis, and not understanding workplace culture." },
-  { q: "What are some common mistakes in written communication at work?", a: "Spelling mistakes, incorrect punctuation, using informal language, emojis, or text shortcuts – all of which look unprofessional to employers and clients." },
-  { q: "What are some strategies employees can use to improve their communication skills?", a: "Study professional communication, practise active listening, ask for feedback from a manager or colleague, and observe how experienced colleagues communicate." },
-  { q: "How do good communication skills help employees advance in their careers?", a: "They are more likely to get promotions, build strong relationships with colleagues and clients, solve problems faster, and represent their company professionally." }
+  { type:'mcq', q:"Why do many employers consider communication skills as important as technical skills?",
+    options:["Technical skills are no longer useful in modern workplaces","How you communicate directly affects your work and career","Artificial intelligence can now replace all technical skills","Communication skills are much faster to learn than technical skills"],
+    correct:1, hint:"💡 Hint: Re-read the introduction paragraph." },
+ 
+  { type:'mcq', q:"According to the text, what percentage of employers think recent graduates lack professional communication skills?",
+    options:["29%","39%","46%","53%"],
+    correct:1, hint:"💡 Hint: Look for a statistic in the 'Why Communication Matters in Business' section." },
+ 
+  { type:'mcq', q:"Which problem can happen when communication fails at work?",
+    options:["Employees receive faster promotions","Companies earn more money from clients","Employees misunderstand instructions, causing delays and errors","Clients develop stronger trust in the company"],
+    correct:2, hint:"💡 Hint: Find the paragraph starting 'When communication fails…'" },
+ 
+  { type:'tf', q:"A good business email should use emojis and text shortcuts to sound friendly and informal.",
+    correct:false, hint:"💡 Hint: Re-read the 'Written Communication' section." },
+ 
+  { type:'mcq', q:"Which of these is NOT mentioned as an important spoken communication skill?",
+    options:["Answering questions confidently","Speaking very quickly to save time","Knowing when to speak and listen in meetings","Adjusting your tone depending on who you are talking to"],
+    correct:1, hint:"💡 Hint: Re-read the 'Spoken Communication' section carefully — which option is NOT there?" },
+ 
+  { type:'mcq', q:"What does 'active listening' mean, according to the text?",
+    options:["Talking more than the other person in a conversation","Writing down everything the speaker says word for word","Paying attention, asking questions, and repeating key points to show understanding","Staying completely quiet and never asking any questions"],
+    correct:2, hint:"💡 Hint: Find the 'Active Listening' section in the text." },
+ 
+  { type:'mcq', q:"Which is a common communication problem that employers notice in new graduates?",
+    options:["Emails that are too long and too formal","Using informal language and emojis in professional emails","Speaking too slowly during presentations","Asking too many questions at meetings"],
+    correct:1, hint:"💡 Hint: Re-read 'Why Companies Worry about Hiring New Graduates'." },
+ 
+  { type:'tf', q:"The text says that having strong technical skills is enough for career success, even without good communication.",
+    correct:false, hint:"💡 Hint: Re-read the final two paragraphs of the text." },
+ 
+  { type:'mcq', q:"Which of these does the text NOT suggest as a strategy to improve communication skills?",
+    options:["Reading well-written business emails and reports","Avoiding all communication practice until you feel fully confident","Asking a manager or coworker to give you feedback","Watching how experienced colleagues communicate"],
+    correct:1, hint:"💡 Hint: Re-read the 'How to Improve Your Communication Skills' section — which option does NOT appear?" },
+ 
+  { type:'mcq', q:"What is ONE benefit of having strong communication skills, according to the text?",
+    options:["You will never need to develop technical skills","You can avoid attending all workplace meetings","You are more likely to get a promotion","You can always work completely alone"],
+    correct:2, hint:"💡 Hint: Re-read 'The Benefits of Strong Communication Skills'." }
 ];
  
 const rewriteSentences = [
@@ -1228,44 +1309,120 @@ function checkSummary() {
   }
 }
  
-// ============ SECTION 4: COMPREHENSION ============
+// ============ SECTION 4: COMPREHENSION (MCQ + T/F) ============
+const compState = {}; // {i: {answered:bool, correct:bool, attempts:int}}
+ 
 function buildComprehension() {
   const c = document.getElementById('comprehensionContainer');
-  c.innerHTML = compQs.map((q,i)=>`
-    <div class="q-item">
-      <div class="q-label">
-        <div class="q-num">${i+1}</div>
-        <div class="q-text">${q.q}</div>
+  c.innerHTML = compQs.map((q,i)=>{
+    const qTypeTag = q.type==='tf'
+      ? `<span style="background:#E8D5B0;color:var(--ink-soft);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-left:8px;">True / False</span>`
+      : `<span style="background:#D0E8D0;color:#1A4A1A;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-left:8px;">Multiple Choice</span>`;
+ 
+    const optionsHTML = q.type==='tf'
+      ? `<div style="display:flex;gap:12px;margin-top:12px;">
+           <button class="tf-btn" id="tf_${i}_true" onclick="answerTF(${i},true)">✅ True</button>
+           <button class="tf-btn" id="tf_${i}_false" onclick="answerTF(${i},false)">❌ False</button>
+         </div>`
+      : `<div class="mcq-options" id="opts_${i}">${q.options.map((o,j)=>`
+           <div class="mcq-opt" id="opt_${i}_${j}" onclick="answerMCQ(${i},${j})">
+             <span class="mcq-letter">${['A','B','C','D'][j]}</span>
+             <span class="mcq-text">${o}</span>
+           </div>`).join('')}
+         </div>`;
+ 
+    return `
+      <div class="comp-q-wrap" id="qwrap_${i}">
+        <div class="comp-q-header">
+          <div class="q-num" style="background:var(--terracotta)">${i+1}</div>
+          <div style="flex:1;">
+            <span class="q-text">${q.q}</span>${qTypeTag}
+          </div>
+        </div>
+        ${optionsHTML}
+        <div class="comp-feedback" id="cfb_${i}"></div>
       </div>
-      <textarea class="text-input" id="cq${i}" placeholder="Write your answer here..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="btn btn-outline btn-sm" onclick="revealAnswer(${i})">🔍 Show Model Answer</button>
-      </div>
-      <div class="model-answer" id="ma${i}">
-        <strong>📝 Model Answer:</strong><br>${q.a}
-      </div>
-    </div>
-    ${i<compQs.length-1?'<hr style="border:none;border-top:1px solid var(--border);margin:6px 0 18px;">':''}
-  `).join('');
+      ${i<compQs.length-1?'<hr style="border:none;border-top:1px solid var(--border);margin:4px 0 20px;">':''}`;
+  }).join('');
 }
  
-function revealAnswer(i) {
-  const el = document.getElementById('ma'+i);
-  el.classList.toggle('show');
+function answerMCQ(qi, chosen) {
+  const st = compState[qi] || {answered:false,correct:false,attempts:0};
+  if(st.answered) return;
+  st.attempts++;
+  const q = compQs[qi];
+  const isCorrect = chosen === q.correct;
+  const fb = document.getElementById('cfb_'+qi);
+ 
+  // Style chosen option
+  const chosenEl = document.getElementById('opt_'+qi+'_'+chosen);
+  if(isCorrect){
+    chosenEl.classList.add('mcq-correct');
+    st.answered = true; st.correct = true;
+    fb.innerHTML = `<span class="fb-ok">✅ Correct! Well done.</span>`;
+    // Lock all options
+    q.options.forEach((_,j)=>{ const el=document.getElementById('opt_'+qi+'_'+j); el.style.pointerEvents='none'; if(j!==chosen) el.style.opacity='0.45'; });
+    addScore(st.attempts===1?8:3);
+    updateCompScore();
+  } else {
+    chosenEl.classList.add('mcq-wrong');
+    chosenEl.style.pointerEvents='none';
+    fb.innerHTML = `<span class="fb-err">❌ Not quite. ${q.hint}</span>`;
+    compState[qi] = st; return;
+  }
+  compState[qi] = st;
+  checkAllDone();
+}
+ 
+function answerTF(qi, chosen) {
+  const st = compState[qi] || {answered:false,correct:false,attempts:0};
+  if(st.answered) return;
+  st.attempts++;
+  const q = compQs[qi];
+  const isCorrect = chosen === q.correct;
+  const fb = document.getElementById('cfb_'+qi);
+  const trueBtn = document.getElementById('tf_'+qi+'_true');
+  const falseBtn = document.getElementById('tf_'+qi+'_false');
+ 
+  if(isCorrect){
+    st.answered = true; st.correct = true;
+    (chosen ? trueBtn : falseBtn).classList.add('tf-correct');
+    trueBtn.disabled = true; falseBtn.disabled = true;
+    fb.innerHTML = `<span class="fb-ok">✅ Correct! Well done.</span>`;
+    addScore(st.attempts===1?8:3);
+    updateCompScore();
+  } else {
+    (chosen ? trueBtn : falseBtn).classList.add('tf-wrong');
+    (chosen ? trueBtn : falseBtn).disabled = true;
+    fb.innerHTML = `<span class="fb-err">❌ Not quite. ${q.hint}</span>`;
+  }
+  compState[qi] = st;
+  checkAllDone();
+}
+ 
+function updateCompScore() {
+  const done = Object.values(compState).filter(s=>s.correct).length;
+  document.getElementById('compScore').textContent = done+'/'+compQs.length;
+}
+ 
+function checkAllDone() {
+  const done = Object.values(compState).filter(s=>s.answered).length;
+  if(done === compQs.length) finishComprehension();
 }
  
 function finishComprehension() {
-  const filled = compQs.filter((_,i)=>document.getElementById('cq'+i).value.trim().length>10).length;
+  const correct = Object.values(compState).filter(s=>s.correct).length;
   const fb = document.getElementById('compFeedback');
-  if(filled < 5){
-    fb.textContent='⚠️ Please answer at least 5 questions before finishing.';
-    fb.className='feedback err show'; return;
+  fb.innerHTML = correct >= 7
+    ? `🎉 Excellent! You got ${correct}/10 correct. You clearly understood the text!`
+    : correct >= 5
+    ? `👍 Good effort! You got ${correct}/10. Go back and re-read the sections for the questions you missed.`
+    : `📖 Keep trying! You got ${correct}/10. Re-read the text carefully and try the wrong ones again.`;
+  fb.className = `feedback ${correct>=5?'ok':'err'} show`;
+  if(correct>=5){
+    earnBadge(3,'Comprehension Star');
+    showToast(`Comprehension complete! ${correct}/10 correct 🌟`);
   }
-  fb.innerHTML='🎉 Well done! You answered '+filled+'/10 questions. Compare your answers with the model answers using the "Show" buttons.';
-  fb.className='feedback ok show';
-  addScore(filled*8);
-  earnBadge(3,'Comprehension Star');
-  showToast('+'+filled*8+' points for comprehension!');
 }
  
 // ============ SECTION 5: FLASHCARDS ============
