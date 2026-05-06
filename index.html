@@ -705,7 +705,7 @@
       <div class="badge" id="b3" title="Comprehension Star">💡</div>
       <div class="badge" id="b4" title="Vocab Master">📚</div>
       <div class="badge" id="b5" title="Critical Thinker">🧠</div>
-      <div class="badge" id="b6" title="Discussion Pro">💬</div>
+      <div class="badge" id="b6" title="Reflective Thinker">💬</div>
     </div>
   </div>
 </div>
@@ -720,7 +720,7 @@
     <button class="tab-btn" onclick="showTab(3)"><span class="tab-num">4</span>Questions</button>
     <button class="tab-btn" onclick="showTab(4)"><span class="tab-num">5</span>Vocabulary</button>
     <button class="tab-btn" onclick="showTab(5)"><span class="tab-num">6</span>Opinions</button>
-    <button class="tab-btn" onclick="showTab(6)"><span class="tab-num">7</span>Discussion</button>
+    <button class="tab-btn" onclick="showTab(6)"><span class="tab-num">7</span>Reflection</button>
   </div>
 </div>
  
@@ -1031,8 +1031,8 @@
 <!-- ======================== SECTION 7: DISCUSSION ======================== -->
 <div class="section" id="sec6">
   <div class="card">
-    <div class="card-title">💬 Let's Talk!</div>
-    <div class="card-sub">Choose <strong>2 questions</strong> to discuss with a partner. Write a few notes first, then share your ideas out loud. There are no wrong answers!</div>
+    <div class="card-title">💭 Personal Reflection</div>
+    <div class="card-sub">Choose <strong>2 questions</strong> and write your own thoughts. There are no right or wrong answers — just be honest!</div>
  
     <div style="background:linear-gradient(135deg,#FFF9ED,#FFF3DC);border:1.5px dashed var(--amber);border-radius:12px;padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:20px;">✍️</span>
@@ -1045,9 +1045,9 @@
     <div id="discussionContainer"></div>
  
     <div style="background:linear-gradient(135deg,#FFF9ED,#FFF3DC);border:1.5px solid var(--amber);border-radius:12px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:20px;">
-      <span style="font-size:14px;font-weight:600;color:var(--ink);">Questions selected: <span id="pickCount" style="color:var(--terracotta);font-family:'DM Serif Display',serif;font-size:20px;">0</span> / 2 needed</span>
+      <span style="font-size:14px;font-weight:600;color:var(--ink);">Questions answered: <span id="pickCount" style="color:var(--terracotta);font-family:'DM Serif Display',serif;font-size:20px;">0</span> / 2 needed</span>
     </div>
-    <button class="btn btn-primary" onclick="finishDiscussion()" style="margin-top:14px;">I'm Ready to Discuss! 🎊</button>
+    <button class="btn btn-primary" onclick="finishDiscussion()" style="margin-top:14px;">Submit My Reflections 🎊</button>
     <button class="btn btn-outline" onclick="showCertificate()" style="margin-top:14px;">🎓 View Certificate</button>
     <div id="discFeedback" class="feedback"></div>
   </div>
@@ -1204,11 +1204,11 @@ const rewriteSentences = [
 ];
  
 const discussionQs = [
-  { emoji:"💼", q:"How do you usually communicate with your classmates and teachers at HCT? Is it different from a workplace?" },
-  { emoji:"📧", q:"Have you ever sent a message or email that was misunderstood? What happened?" },
-  { emoji:"🎤", q:"How do you feel about giving presentations? What do you do to feel less nervous?" },
-  { emoji:"👂", q:"Do you think you are a good listener? Give one example that shows this." },
-  { emoji:"🌟", q:"In your opinion, what is the MOST important communication skill for success in the UAE workplace? Why?" }
+  { emoji:"💼", q:"How do you usually communicate with your classmates and teachers at HCT? Give one example." },
+  { emoji:"📧", q:"Have you ever sent a message that was misunderstood? What happened and what did you learn?" },
+  { emoji:"🎤", q:"How do you feel about giving presentations? What is one thing you can do to improve?" },
+  { emoji:"👂", q:"Do you think you are a good listener? Give one reason why or why not." },
+  { emoji:"🌟", q:"In your opinion, what is the most important communication skill for your future career? Why?" }
 ];
  
 // ============ STATE ============
@@ -1576,9 +1576,9 @@ function buildDiscussion() {
       </div>
       <div class="disc-body" id="db_${i}" style="display:none;">
         <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-          <button class="disc-pick-btn" id="dpick_${i}" onclick="pickQuestion(${i})">✅ I'll discuss this one</button>
+          <button class="disc-pick-btn" id="dpick_${i}" onclick="pickQuestion(${i})">✅ I'll answer this one</button>
         </div>
-        <textarea class="discuss-input" id="dq${i}" placeholder="Jot down a few notes before you discuss with your partner..." style="min-height:70px;"></textarea>
+        <textarea class="discuss-input" id="dq${i}" placeholder="Write your answer here in 2–3 sentences..." style="min-height:80px;"></textarea>
       </div>
     </div>
   `).join('');
@@ -1615,13 +1615,19 @@ function pickQuestion(i) {
 function finishDiscussion() {
   const fb = document.getElementById('discFeedback');
   if(pickedQuestions.size < 2){
-    fb.textContent = '⚠️ Please select at least 2 questions to discuss with your partner.';
+    fb.textContent = '⚠️ Please select and answer at least 2 questions.';
     fb.className = 'feedback err show'; return;
   }
-  fb.innerHTML = '🎉 Great! You selected '+pickedQuestions.size+' questions to discuss. Now talk with your partner and share your ideas!';
+  // Check they actually wrote something
+  const written = [...pickedQuestions].filter(i => document.getElementById('dq'+i).value.trim().length > 10).length;
+  if(written < 2){
+    fb.textContent = '⚠️ Please write your answers in the text boxes before finishing.';
+    fb.className = 'feedback err show'; return;
+  }
+  fb.innerHTML = '🎉 Great reflection! You answered '+written+' questions thoughtfully. Well done!';
   fb.className = 'feedback ok show';
-  addScore(pickedQuestions.size * 10);
-  earnBadge(6,'Discussion Pro');
+  addScore(written * 10);
+  earnBadge(6,'Reflective Thinker');
   confetti();
   setTimeout(()=>showCertificate(), 1400);
 }
