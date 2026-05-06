@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -532,6 +532,39 @@
   }
   .footer span { color: var(--amber); font-weight: 600; }
  
+  /* DISCUSSION CARDS */
+  .disc-card {
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    background: var(--warm-white);
+  }
+  .disc-card-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .disc-card-header:hover { background: #FFFBEF; }
+  .disc-q-text { flex: 1; font-size: 14px; font-weight: 500; color: var(--ink-soft); line-height: 1.5; }
+  .disc-toggle { font-size: 22px; color: var(--amber-dark); font-weight: 300; flex-shrink: 0; width: 28px; text-align: center; }
+  .disc-body { padding: 0 18px 18px; border-top: 1px solid var(--border); }
+  .disc-pick-btn {
+    padding: 8px 18px;
+    border: 1.5px solid var(--forest-light);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--forest);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600; font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 12px;
+  }
+  .disc-pick-btn:hover { background: var(--forest); color: #fff; }
+ 
   /* MCQ & TRUE/FALSE STYLES */
   .comp-q-wrap { margin-bottom: 6px; }
   .comp-q-header {
@@ -998,8 +1031,8 @@
 <!-- ======================== SECTION 7: DISCUSSION ======================== -->
 <div class="section" id="sec6">
   <div class="card">
-    <div class="card-title">💬 Discussion Questions</div>
-    <div class="card-sub">First, write your ideas. Then discuss with a partner in class!</div>
+    <div class="card-title">💬 Let's Talk!</div>
+    <div class="card-sub">Choose <strong>2 questions</strong> to discuss with a partner. Write a few notes first, then share your ideas out loud. There are no wrong answers!</div>
  
     <div style="background:linear-gradient(135deg,#FFF9ED,#FFF3DC);border:1.5px dashed var(--amber);border-radius:12px;padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:20px;">✍️</span>
@@ -1011,8 +1044,11 @@
  
     <div id="discussionContainer"></div>
  
-    <button class="btn btn-primary" onclick="finishDiscussion()" style="margin-top:20px;">Submit Discussion Answers 🎊</button>
-    <button class="btn btn-outline" onclick="showCertificate()" style="margin-top:20px;">🎓 View Certificate</button>
+    <div style="background:linear-gradient(135deg,#FFF9ED,#FFF3DC);border:1.5px solid var(--amber);border-radius:12px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:20px;">
+      <span style="font-size:14px;font-weight:600;color:var(--ink);">Questions selected: <span id="pickCount" style="color:var(--terracotta);font-family:'DM Serif Display',serif;font-size:20px;">0</span> / 2 needed</span>
+    </div>
+    <button class="btn btn-primary" onclick="finishDiscussion()" style="margin-top:14px;">I'm Ready to Discuss! 🎊</button>
+    <button class="btn btn-outline" onclick="showCertificate()" style="margin-top:14px;">🎓 View Certificate</button>
     <div id="discFeedback" class="feedback"></div>
   </div>
 </div>
@@ -1168,16 +1204,11 @@ const rewriteSentences = [
 ];
  
 const discussionQs = [
-  "How do you usually communicate with your classmates and teachers at HCT?",
-  "Why do you think good communication is important in your future job?",
-  "Can you share an experience when poor communication caused a problem for you?",
-  "What types of written communication do you use most often – for example, WhatsApp messages, emails, or reports?",
-  "How do you feel about giving presentations to a group? Do you feel nervous or confident?",
-  "Have you ever had trouble understanding instructions from someone? How did you handle it?",
-  "What strategies do you use to listen actively during conversations?",
-  "Is it easy or difficult to adjust your communication style based on who you are talking to?",
-  "How can feedback from others help improve your communication skills?",
-  "In your opinion, what is the most important communication skill for success in the UAE workplace? Why?"
+  { emoji:"💼", q:"How do you usually communicate with your classmates and teachers at HCT? Is it different from a workplace?" },
+  { emoji:"📧", q:"Have you ever sent a message or email that was misunderstood? What happened?" },
+  { emoji:"🎤", q:"How do you feel about giving presentations? What do you do to feel less nervous?" },
+  { emoji:"👂", q:"Do you think you are a good listener? Give one example that shows this." },
+  { emoji:"🌟", q:"In your opinion, what is the MOST important communication skill for success in the UAE workplace? Why?" }
 ];
  
 // ============ STATE ============
@@ -1537,29 +1568,61 @@ function submitOpinion() {
 function buildDiscussion() {
   const c = document.getElementById('discussionContainer');
   c.innerHTML = discussionQs.map((q,i)=>`
-    <div class="discuss-item">
-      <div class="discuss-q">
-        <span class="dq-num">${i+1}</span>
-        ${q}
+    <div class="disc-card" id="dc_${i}">
+      <div class="disc-card-header" onclick="toggleDisc(${i})">
+        <span style="font-size:22px;">${q.emoji}</span>
+        <span class="disc-q-text">Question ${i+1}: ${q.q}</span>
+        <span class="disc-toggle" id="dt_${i}">＋</span>
       </div>
-      <textarea class="discuss-input" id="dq${i}" placeholder="Write your ideas here first, then discuss with a partner..."></textarea>
+      <div class="disc-body" id="db_${i}" style="display:none;">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <button class="disc-pick-btn" id="dpick_${i}" onclick="pickQuestion(${i})">✅ I'll discuss this one</button>
+        </div>
+        <textarea class="discuss-input" id="dq${i}" placeholder="Jot down a few notes before you discuss with your partner..." style="min-height:70px;"></textarea>
+      </div>
     </div>
   `).join('');
 }
  
-function finishDiscussion() {
-  const filled = discussionQs.filter((_,i)=>document.getElementById('dq'+i).value.trim().length>10).length;
-  const fb = document.getElementById('discFeedback');
-  if(filled < 5){
-    fb.textContent='⚠️ Please write ideas for at least 5 discussion questions.';
-    fb.className='feedback err show'; return;
+function toggleDisc(i) {
+  const body = document.getElementById('db_'+i);
+  const toggle = document.getElementById('dt_'+i);
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  toggle.textContent = open ? '＋' : '－';
+}
+ 
+let pickedQuestions = new Set();
+ 
+function pickQuestion(i) {
+  const btn = document.getElementById('dpick_'+i);
+  if(pickedQuestions.has(i)){
+    pickedQuestions.delete(i);
+    btn.textContent = '✅ I\'ll discuss this one';
+    btn.style.background = '';
+    btn.style.color = '';
+    document.getElementById('dc_'+i).style.borderColor = '';
+  } else {
+    pickedQuestions.add(i);
+    btn.textContent = '⭐ Selected!';
+    btn.style.background = 'var(--forest)';
+    btn.style.color = '#fff';
+    document.getElementById('dc_'+i).style.borderColor = 'var(--forest)';
   }
-  fb.innerHTML='🎉 Brilliant! You prepared answers for '+filled+'/10 discussion questions. Now share your ideas with a partner!';
-  fb.className='feedback ok show';
-  addScore(filled*5);
+  document.getElementById('pickCount').textContent = pickedQuestions.size;
+}
+ 
+function finishDiscussion() {
+  const fb = document.getElementById('discFeedback');
+  if(pickedQuestions.size < 2){
+    fb.textContent = '⚠️ Please select at least 2 questions to discuss with your partner.';
+    fb.className = 'feedback err show'; return;
+  }
+  fb.innerHTML = '🎉 Great! You selected '+pickedQuestions.size+' questions to discuss. Now talk with your partner and share your ideas!';
+  fb.className = 'feedback ok show';
+  addScore(pickedQuestions.size * 10);
   earnBadge(6,'Discussion Pro');
   confetti();
-  setTimeout(confetti,600);
   setTimeout(()=>showCertificate(), 1400);
 }
  
